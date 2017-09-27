@@ -78,7 +78,8 @@ extensions.
 This option specifies the target architecture.  The assembler will
 issue an error message if an attempt is made to assemble an
 instruction which will not execute on the target architecture.  The
-only value for @var{architecture} is @code{armv8-a}.
+following architecture names are recognized: @code{armv8-a},
+@code{armv8.1-a} and @code{armv8.2-a}.
 
 If both @option{-mcpu} and @option{-march} are specified, the
 assembler will use the setting for @option{-mcpu}.  If neither are
@@ -122,7 +123,7 @@ automatically cause those extensions to be disabled.
 @multitable @columnfractions .12 .17 .17 .54
 @headitem Extension @tab Minimum Architecture @tab Enabled by default
  @tab Description
-@item @code{crc} @tab ARMv8-A @tab No
+@item @code{crc} @tab ARMv8-A @tab ARMv8.1-A or later
  @tab Enable CRC instructions.
 @item @code{crypto} @tab ARMv8-A @tab No
  @tab Enable cryptographic extensions.  This implies @code{fp} and @code{simd}.
@@ -130,6 +131,17 @@ automatically cause those extensions to be disabled.
  @tab Enable floating-point extensions.
 @item @code{simd} @tab ARMv8-A @tab ARMv8-A or later
  @tab Enable Advanced SIMD extensions.  This implies @code{fp}.
+@item @code{pan} @tab ARMv8-A @tab ARMv8-A or later
+ @tab Enable Privileged Access Never support.
+@item @code{lor} @tab ARMv8-A @tab ARMv8-A or later
+ @tab Enable Limited Ordering Regions extensions.
+@item @code{rdma} @tab ARMv8-A @tab ARMv8-A or later
+ @tab Enable ARMv8.1 Advanced SIMD extensions.  This implies @code{simd}.
+@item @code{fp16} @tab ARMv8.2-A @tab ARMv8.2-A or later
+ @tab Enable ARMv8.2 16-bit floating-point support.  This implies
+ @code{fp}.
+@item @code{profile} @tab ARMv8.2-A @tab No
+ @tab Enable statistical profiling extensions.
 @end multitable
 
 @node AArch64 Syntax
@@ -231,6 +243,24 @@ The AArch64 architecture uses @sc{ieee} floating-point numbers.
 @table @code
 
 @c AAAAAAAAAAAAAAAAAAAAAAAAA
+
+@cindex @code{.arch} directive, AArch64
+@item .arch @var{name}
+Select the target architecture.  Valid values for @var{name} are the same as
+for the @option{-march} commandline option.
+
+Specifying @code{.arch} clears any previously selected architecture
+extensions.
+
+@cindex @code{.arch_extension} directive, AArch64
+@item .arch_extension @var{name}
+Add or remove an architecture extension to the target architecture.  Valid
+values for @var{name} are the same as those accepted as architectural
+extensions by the @option{-mcpu} commandline option.
+
+@code{.arch_extension} may be used multiple times to add or remove extensions
+incrementally to the architecture being compiled for.
+
 @c BBBBBBBBBBBBBBBBBBBBBBBBBB
 
 @cindex @code{.bss} directive, AArch64

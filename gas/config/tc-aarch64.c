@@ -421,6 +421,7 @@ static struct hash_control *aarch64_reg_hsh;
 static struct hash_control *aarch64_barrier_opt_hsh;
 static struct hash_control *aarch64_nzcv_hsh;
 static struct hash_control *aarch64_pldop_hsh;
+static struct hash_control *aarch64_hint_opt_hsh;
 
 /* Stuff needed to resolve the label ambiguity
    As:
@@ -1739,12 +1740,12 @@ s_ltorg (int ignored ATTRIBUTE_UNUSED)
       if (pool == NULL || pool->symbol == NULL || pool->next_free_entry == 0)
 	continue;
 
-      mapping_state (MAP_DATA);
-
       /* Align pool as you have word accesses.
          Only make a frag if we have to.  */
       if (!need_pass_2)
 	frag_align (align, 0, 0);
+
+      mapping_state (MAP_DATA);
 
       record_alignment (now_seg, align);
 
@@ -1917,6 +1918,7 @@ s_tlsdesccall (int ignored ATTRIBUTE_UNUSED)
 
 static void s_aarch64_arch (int);
 static void s_aarch64_cpu (int);
+static void s_aarch64_arch_extension (int);
 
 /* This table describes all the machine specific pseudo-ops the assembler
    has to support.  The fields are:
@@ -1934,6 +1936,7 @@ const pseudo_typeS md_pseudo_table[] = {
   {"pool", s_ltorg, 0},
   {"cpu", s_aarch64_cpu, 0},
   {"arch", s_aarch64_arch, 0},
+  {"arch_extension", s_aarch64_arch_extension, 0},
   {"inst", s_aarch64_inst, 0},
 #ifdef OBJ_ELF
   {"tlsdesccall", s_tlsdesccall, 0},
@@ -3304,14 +3307,54 @@ parse_barrier (char **str)
   return o->value;
 }
 
+/* Parse an operand for a PSB barrier.  Set *HINT_OPT to the hint-option record
+   return 0 if successful.  Otherwise return PARSE_FAIL.  */
+
+static int
+parse_barrier_psb (char **str,
+		   const struct aarch64_name_value_pair ** hint_opt)
+{
+  char *p, *q;
+  const struct aarch64_name_value_pair *o;
+
+  p = q = *str;
+  while (ISALPHA (*q))
+    q++;
+
+  o = hash_find_n (aarch64_hint_opt_hsh, p, q - p);
+  if (!o)
+    {
+      set_fatal_syntax_error
+	( _("unknown or missing option to PSB"));
+      return PARSE_FAIL;
+    }
+
+  if (o->value != 0x11)
+    {
+      /* PSB only accepts option name 'CSYNC'.  */
+      set_syntax_error
+	(_("the specified option is not accepted for PSB"));
+      return PARSE_FAIL;
+    }
+
+  *str = q;
+  *hint_opt = o;
+  return 0;
+}
+
 /* Parse a system register or a PSTATE field name for an MSR/MRS instruction.
    Returns the encoding for the option, or PARSE_FAIL.
 
    If IMPLE_DEFINED_P is non-zero, the function will also try to parse the
-   implementation defined system register name S<op0>_<op1>_<Cn>_<Cm>_<op2>.  */
+   implementation defined system register name S<op0>_<op1>_<Cn>_<Cm>_<op2>.
+
+   If PSTATEFIELD_P is non-zero, the function will parse the name as a PSTATE
+   field, otherwise as a system register.
+*/
 
 static int
-parse_sys_reg (char **str, struct hash_control *sys_regs, int imple_defined_p)
+parse_sys_reg (char **str, struct hash_control *sys_regs,
+	       int imple_defined_p, int pstatefield_p)
 {
   char *p, *q;
   char buf[32];
@@ -3346,9 +3389,15 @@ parse_sys_reg (char **str, struct hash_control *sys_regs, int imple_defined_p)
     }
   else
     {
+      if (pstatefield_p && !aarch64_pstatefield_supported_p (cpu_variant, o))
+	as_bad (_("selected processor does not support PSTATE field "
+		  "name '%s'"), buf);
+      if (!pstatefield_p && !aarch64_sys_reg_supported_p (cpu_variant, o))
+	as_bad (_("selected processor does not support system register "
+		  "name '%s'"), buf);
       if (aarch64_sys_reg_deprecated_p (o))
 	as_warn (_("system register name '%s' is deprecated and may be "
-"removed in a future release"), buf);
+		   "removed in a future release"), buf);
       value = o->value;
     }
 
@@ -3375,6 +3424,10 @@ parse_sys_ins_reg (char **str, struct hash_control *sys_ins_regs)
   o = hash_find (sys_ins_regs, buf);
   if (!o)
     return NULL;
+
+  if (!aarch64_sys_ins_reg_supported_p (cpu_variant, o))
+    as_bad (_("selected processor does not support system register "
+	      "name '%s'"), buf);
 
   *str = q;
   return o;
@@ -5215,7 +5268,7 @@ parse_operands (char *str, const aarch64_opcode *opcode)
 	  break;
 
 	case AARCH64_OPND_SYSREG:
-	  if ((val = parse_sys_reg (&str, aarch64_sys_regs_hsh, 1))
+	  if ((val = parse_sys_reg (&str, aarch64_sys_regs_hsh, 1, 0))
 	      == PARSE_FAIL)
 	    {
 	      set_syntax_error (_("unknown or missing system register name"));
@@ -5225,7 +5278,7 @@ parse_operands (char *str, const aarch64_opcode *opcode)
 	  break;
 
 	case AARCH64_OPND_PSTATEFIELD:
-	  if ((val = parse_sys_reg (&str, aarch64_pstatefield_hsh, 0))
+	  if ((val = parse_sys_reg (&str, aarch64_pstatefield_hsh, 0, 1))
 	      == PARSE_FAIL)
 	    {
 	      set_syntax_error (_("unknown or missing PSTATE field name"));
@@ -5282,6 +5335,12 @@ sys_reg_ins:
 	  if (val == PARSE_FAIL)
 	    po_imm_or_fail (0, 31);
 	  inst.base.operands[i].prfop = aarch64_prfops + val;
+	  break;
+
+	case AARCH64_OPND_BARRIER_PSB:
+	  val = parse_barrier_psb (&str, &(info->hint_option));
+	  if (val == PARSE_FAIL)
+	    goto failure;
 	  break;
 
 	default:
@@ -5903,20 +5962,20 @@ aarch64_init_frag (fragS * fragP, int max_chars)
      later if the alignment ends up empty.  */
   if (!fragP->tc_frag_data.recorded)
     {
-      fragP->tc_frag_data.recorded = 1;
-      switch (fragP->fr_type)
-	{
-	case rs_align:
-	case rs_align_test:
-	case rs_fill:
-	  mapping_state_2 (MAP_DATA, max_chars);
-	  break;
-	case rs_align_code:
-	  mapping_state_2 (MAP_INSN, max_chars);
-	  break;
-	default:
-	  break;
-	}
+    case rs_align_test:
+    case rs_fill:
+      mapping_state_2 (MAP_DATA, max_chars);
+      break;
+    case rs_align:
+      /* PR 20364: We can get alignment frags in code sections,
+	 so do not just assume that we should use the MAP_DATA state.  */
+      mapping_state_2 (subseg_text_p (now_seg) ? MAP_INSN : MAP_DATA, max_chars);
+      break;
+    case rs_align_code:
+      mapping_state_2 (MAP_INSN, max_chars);
+      break;
+    default:
+      break;
     }
 }
 
@@ -7008,7 +7067,8 @@ md_begin (void)
       || (aarch64_reg_hsh = hash_new ()) == NULL
       || (aarch64_barrier_opt_hsh = hash_new ()) == NULL
       || (aarch64_nzcv_hsh = hash_new ()) == NULL
-      || (aarch64_pldop_hsh = hash_new ()) == NULL)
+      || (aarch64_pldop_hsh = hash_new ()) == NULL
+      || (aarch64_hint_opt_hsh = hash_new ()) == NULL)
     as_fatal (_("virtual memory exhausted"));
 
   fill_instruction_hash_table ();
@@ -7102,6 +7162,17 @@ md_begin (void)
       /* Also hash the name in the upper case.  */
       checked_hash_insert (aarch64_pldop_hsh, get_upper_str (name),
 			   (void *) (aarch64_prfops + i));
+    }
+
+  for (i = 0; aarch64_hint_options[i].name != NULL; i++)
+    {
+      const char* name = aarch64_hint_options[i].name;
+
+      checked_hash_insert (aarch64_hint_opt_hsh, name,
+			   (void *) (aarch64_hint_options + i));
+      /* Also hash the name in the upper case.  */
+      checked_hash_insert (aarch64_pldop_hsh, get_upper_str (name),
+			   (void *) (aarch64_hint_options + i));
     }
 
   /* Set the cpu variant based on the command-line options.  */
@@ -7204,6 +7275,8 @@ struct aarch64_arch_option_table
 static const struct aarch64_arch_option_table aarch64_archs[] = {
   {"all", AARCH64_ANY},
   {"armv8-a", AARCH64_ARCH_V8},
+  {"armv8.1-a", AARCH64_ARCH_V8_1},
+  {"armv8.2-a", AARCH64_ARCH_V8_2},
   {NULL, AARCH64_ARCH_NONE}
 };
 
@@ -7220,6 +7293,13 @@ static const struct aarch64_option_cpu_value_table aarch64_features[] = {
   {"fp",		AARCH64_FEATURE (AARCH64_FEATURE_FP, 0)},
   {"lse",		AARCH64_FEATURE (AARCH64_FEATURE_LSE, 0)},
   {"simd",		AARCH64_FEATURE (AARCH64_FEATURE_SIMD, 0)},
+  {"pan",		AARCH64_FEATURE (AARCH64_FEATURE_PAN, 0)},
+  {"lor",		AARCH64_FEATURE (AARCH64_FEATURE_LOR, 0)},
+  {"rdma",		AARCH64_FEATURE (AARCH64_FEATURE_SIMD
+					 | AARCH64_FEATURE_RDMA, 0)},
+  {"fp16",		AARCH64_FEATURE (AARCH64_FEATURE_F16
+					 | AARCH64_FEATURE_FP, 0)},
+  {"profile",		AARCH64_FEATURE (AARCH64_FEATURE_PROFILE, 0)},
   {NULL,		AARCH64_ARCH_NONE}
 };
 
@@ -7232,7 +7312,8 @@ struct aarch64_long_option_table
 };
 
 static int
-aarch64_parse_features (char *str, const aarch64_feature_set **opt_p)
+aarch64_parse_features (char *str, const aarch64_feature_set **opt_p,
+			bfd_boolean ext_only)
 {
   /* We insist on extensions being added before being removed.  We achieve
      this by using the ADDING_VALUE variable to indicate whether we are
@@ -7248,17 +7329,19 @@ aarch64_parse_features (char *str, const aarch64_feature_set **opt_p)
   while (str != NULL && *str != 0)
     {
       const struct aarch64_option_cpu_value_table *opt;
-      char *ext;
+      char *ext = NULL;
       int optlen;
 
-      if (*str != '+')
+      if (!ext_only)
 	{
-	  as_bad (_("invalid architectural extension"));
-	  return 0;
-	}
+	  if (*str != '+')
+	    {
+	      as_bad (_("invalid architectural extension"));
+	      return 0;
+	    }
 
-      str++;
-      ext = strchr (str, '+');
+	  ext = strchr (++str, '+');
+	}
 
       if (ext != NULL)
 	optlen = ext - str;
@@ -7338,7 +7421,7 @@ aarch64_parse_cpu (char *str)
       {
 	mcpu_cpu_opt = &opt->value;
 	if (ext != NULL)
-	  return aarch64_parse_features (ext, &mcpu_cpu_opt);
+	  return aarch64_parse_features (ext, &mcpu_cpu_opt, FALSE);
 
 	return 1;
       }
@@ -7370,7 +7453,7 @@ aarch64_parse_arch (char *str)
       {
 	march_cpu_opt = &opt->value;
 	if (ext != NULL)
-	  return aarch64_parse_features (ext, &march_cpu_opt);
+	  return aarch64_parse_features (ext, &march_cpu_opt, FALSE);
 
 	return 1;
       }
@@ -7553,7 +7636,7 @@ s_aarch64_cpu (int ignored ATTRIBUTE_UNUSED)
       {
 	mcpu_cpu_opt = &opt->value;
 	if (ext != NULL)
-	  if (!aarch64_parse_features (ext, &mcpu_cpu_opt))
+	  if (!aarch64_parse_features (ext, &mcpu_cpu_opt, FALSE))
 	    return;
 
 	cpu_variant = *mcpu_cpu_opt;
@@ -7599,7 +7682,7 @@ s_aarch64_arch (int ignored ATTRIBUTE_UNUSED)
       {
 	mcpu_cpu_opt = &opt->value;
 	if (ext != NULL)
-	  if (!aarch64_parse_features (ext, &mcpu_cpu_opt))
+	  if (!aarch64_parse_features (ext, &mcpu_cpu_opt, FALSE))
 	    return;
 
 	cpu_variant = *mcpu_cpu_opt;
@@ -7612,6 +7695,28 @@ s_aarch64_arch (int ignored ATTRIBUTE_UNUSED)
   as_bad (_("unknown architecture `%s'\n"), name);
   *input_line_pointer = saved_char;
   ignore_rest_of_line ();
+}
+
+/* Parse a .arch_extension directive.  */
+
+static void
+s_aarch64_arch_extension (int ignored ATTRIBUTE_UNUSED)
+{
+  char saved_char;
+  char *ext = input_line_pointer;;
+
+  while (*input_line_pointer && !ISSPACE (*input_line_pointer))
+    input_line_pointer++;
+  saved_char = *input_line_pointer;
+  *input_line_pointer = 0;
+
+  if (!aarch64_parse_features (ext, &mcpu_cpu_opt, TRUE))
+    return;
+
+  cpu_variant = *mcpu_cpu_opt;
+
+  *input_line_pointer = saved_char;
+  demand_empty_rest_of_line ();
 }
 
 /* Copy symbol information.  */

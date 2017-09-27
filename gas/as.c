@@ -289,6 +289,8 @@ Options:\n\
   fprintf (stream, _("\
   --size-check=[error|warning]\n\
 			  ELF .size directive check (default --size-check=error)\n"));
+  fprintf (stream, _("\
+  --sectname-subst        enable section name substitution sequences\n"));
 #endif
   fprintf (stream, _("\
   -f                      skip whitespace and comment preprocessing\n"));
@@ -452,6 +454,7 @@ parse_args (int * pargc, char *** pargv)
       OPTION_EXECSTACK,
       OPTION_NOEXECSTACK,
       OPTION_SIZE_CHECK,
+      OPTION_SECTNAME_SUBST,
       OPTION_ALTERNATE,
       OPTION_AL,
       OPTION_HASH_TABLE_SIZE,
@@ -490,6 +493,7 @@ parse_args (int * pargc, char *** pargv)
     ,{"execstack", no_argument, NULL, OPTION_EXECSTACK}
     ,{"noexecstack", no_argument, NULL, OPTION_NOEXECSTACK}
     ,{"size-check", required_argument, NULL, OPTION_SIZE_CHECK}
+    ,{"sectname-subst", no_argument, NULL, OPTION_SECTNAME_SUBST}
 #endif
     ,{"fatal-warnings", no_argument, NULL, OPTION_WARN_FATAL}
     ,{"gdwarf-2", no_argument, NULL, OPTION_GDWARF2}
@@ -848,6 +852,10 @@ This program has absolutely no warranty.\n"));
 	    flag_size_check = size_check_warning;
 	  else
 	    as_fatal (_("Invalid --size-check= option: `%s'"), optarg);
+	  break;
+
+	case OPTION_SECTNAME_SUBST:
+	  flag_sectname_subst = 1;
 	  break;
 #endif
 	case 'Z':
