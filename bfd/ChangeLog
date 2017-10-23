@@ -1,3 +1,21 @@
+2017-10-05  Alan Modra  <amodra@gmail.com>
+
+	* elflink.c (elf_link_input_bfd): Correct ctor/dtor in init_array/
+	fini_array error value.
+
+2017-10-04  Pavel I. Kryukov <kryukov@frtk.ru>
+
+	PR 22245
+	* bfd.c (bfd_set_error): Avoid UB on passing arg to va_start that
+	undergoes default promotion.
+	* bfd-in2.h: Regenerate.
+
+2017-09-28  Alan Modra  <amodra@gmail.com>
+
+	PR 22220
+	* elflink.c (_bfd_elf_merge_symbol): Set non_ir_ref_dynamic in
+	a case where plugin_notice isn't called.
+
 2017-09-26  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR ld/22199
