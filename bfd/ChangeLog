@@ -1,3 +1,53 @@
+2017-11-05  Alan Modra  <amodra@gmail.com>
+
+	PR 22397
+	* bfd.c (_bfd_doprnt_scan): Check args index before storing, not
+	after.
+
+2017-11-05  Alan Modra  <amodra@gmail.com>
+
+	PR 22397
+	* bfd.c (union _bfd_doprnt_args): New.
+	(PRINT_TYPE): Add FIELD arg.  Take value from args.
+	(_bfd_doprnt): Replace ap parameter with args.  Adjust all
+	PRINT_TYPE invocations and reading of format args to suit.
+	Move "%%" handling out of switch handling args.  Support
+	positional parameters.
+	(_bfd_doprnt_scan): New function.
+	(error_handler_internal): Call _bfd_doprnt_scan and read args.
+
+2017-11-05  Alan Modra  <amodra@gmail.com>
+
+	Apply from master
+	2017-10-11  Pedro Alves  <palves@redhat.com>
+	* bfd.c (_doprnt): Rename to ...
+	(_bfd_doprnt): ... this.
+	(error_handler_internal): Adjust.
+
+2017-11-01  Alan Modra  <amodra@gmail.com>
+
+	Apply from master
+	2017-10-30  Alan Modra  <amodra@gmail.com>
+	* elf32-frv.c (ELF_TARGET_ID): Don't define for generic
+	elf target.
+
+	2017-10-30  Alan Modra  <amodra@gmail.com>
+	* elflink.c (elf_gc_sweep): Test elf_object_id in addition to
+	relocs_compatible.
+	(bfd_elf_gc_sections): Likewise.
+
+	2017-10-28  Alan Modra  <amodra@gmail.com>
+	PR 22300
+	* elflink.c (_bfd_elf_merge_symbol): Remove relocs_compatible check.
+	* elf32-hppa.c (elf_backend_relocs_compatible): Define.
+	* elf32-ppc.c (elf_backend_relocs_compatible): Define.
+	* elf64-ppc.c (elf_backend_relocs_compatible): Define.
+
+	2017-10-25  Alan Modra  <amodra@gmail.com>
+	* archive.c (_bfd_compute_and_write_armap): Match "__gnu_lto_slim"
+	optionally prefixed with "_".
+	* linker.c (_bfd_generic_link_add_one_symbol): Likewise.
+
 2017-10-05  Alan Modra  <amodra@gmail.com>
 
 	* elflink.c (elf_link_input_bfd): Correct ctor/dtor in init_array/
