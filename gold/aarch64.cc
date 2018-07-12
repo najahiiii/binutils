@@ -7032,7 +7032,7 @@ Target_aarch64<size, big_endian>::Relocate::relocate(
     const Relocate_info<size, big_endian>* relinfo,
     unsigned int,
     Target_aarch64<size, big_endian>* target,
-    Output_section* ,
+    Output_section* output_section,
     size_t relnum,
     const unsigned char* preloc,
     const Sized_symbol<size>* gsym,
@@ -7128,6 +7128,7 @@ Target_aarch64<size, big_endian>::Relocate::relocate(
 
   typename Reloc::Status reloc_status = Reloc::STATUS_OKAY;
   typename elfcpp::Elf_types<size>::Elf_Addr value;
+  bool is_section_alloc = (output_section->flags() & elfcpp::SHF_ALLOC);
   switch (r_type)
     {
     case elfcpp::R_AARCH64_NONE:
@@ -7136,6 +7137,7 @@ Target_aarch64<size, big_endian>::Relocate::relocate(
     case elfcpp::R_AARCH64_ABS64:
       if (!parameters->options().apply_dynamic_relocs()
           && parameters->options().output_is_position_independent()
+          && is_section_alloc
           && gsym != NULL
           && gsym->needs_dynamic_reloc(reloc_property->reference_flags())
           && !gsym->can_use_relative_reloc(false))
@@ -7150,6 +7152,7 @@ Target_aarch64<size, big_endian>::Relocate::relocate(
     case elfcpp::R_AARCH64_ABS32:
       if (!parameters->options().apply_dynamic_relocs()
           && parameters->options().output_is_position_independent()
+          && is_section_alloc
           && gsym != NULL
           && gsym->needs_dynamic_reloc(reloc_property->reference_flags()))
         // We have generated an absolute dynamic relocation, so do not
@@ -7163,6 +7166,7 @@ Target_aarch64<size, big_endian>::Relocate::relocate(
     case elfcpp::R_AARCH64_ABS16:
       if (!parameters->options().apply_dynamic_relocs()
           && parameters->options().output_is_position_independent()
+          && is_section_alloc
           && gsym != NULL
           && gsym->needs_dynamic_reloc(reloc_property->reference_flags()))
         // We have generated an absolute dynamic relocation, so do not
