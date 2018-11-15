@@ -2308,6 +2308,19 @@ plugin_test_thin.a: two_file_test_1.o two_file_test_1b.o two_file_test_2.o
 	$(TEST_AR) crT $@ $^
 
 
+check_PROGRAMS += plugin_test_wrap_symbols
+check_SCRIPTS += plugin_test_wrap_symbols.sh
+check_DATA += plugin_test_wrap_symbols.err
+MOSTLYCLEANFILES += plugin_test_wrap_symbols.err
+plugin_test_wrap_symbols_1.o: plugin_test_wrap_symbols_1.cc
+	$(COMPILE) -c -o $@ $<
+plugin_test_wrap_symbols_2.o: plugin_test_wrap_symbols_2.cc
+	$(COMPILE) -c -o $@ $<
+plugin_test_wrap_symbols: plugin_test_wrap_symbols_1.o plugin_test_wrap_symbols_2.o gcctestdir/ld plugin_test.so
+	$(CXXLINK) -Bgcctestdir/ -Wl,--plugin,"./plugin_test.so" -Wl,--wrap=hello,--wrap=jello plugin_test_wrap_symbols_1.o plugin_test_wrap_symbols_2.o 2>plugin_test_wrap_symbols.err
+plugin_test_wrap_symbols.err: plugin_test_wrap_symbols
+	@touch plugin_test_wrap_symbols.err
+
 check_PROGRAMS += plugin_test_start_lib
 check_SCRIPTS += plugin_test_start_lib.sh
 check_DATA += plugin_test_start_lib.err
@@ -2318,10 +2331,21 @@ plugin_test_start_lib: unused.o plugin_start_lib_test.o plugin_start_lib_test_2.
 plugin_test_start_lib.err: plugin_test_start_lib
 	@touch plugin_test_start_lib.err
 
+check_PROGRAMS += plugin_test_defsym
+check_SCRIPTS += plugin_test_defsym.sh
+check_DATA += plugin_test_defsym.err
+MOSTLYCLEANFILES += plugin_test_defsym.err
+plugin_test_defsym.syms: plugin_test_defsym.o
+	$(TEST_READELF) -sW $< >$@ 2>/dev/null
+plugin_test_defsym.o: plugin_test_defsym.c
+	$(COMPILE) -c -o $@ $<
+plugin_test_defsym: plugin_test_defsym.o plugin_test_defsym.syms gcctestdir/ld plugin_test.so
+	$(CXXLINK) -Bgcctestdir/ -Wl,--no-demangle,--plugin,"./plugin_test.so" -Wl,--defsym,bar=foo plugin_test_defsym.syms 2>plugin_test_defsym.err
+plugin_test_defsym.err: plugin_test_defsym
+	@touch plugin_test_defsym.err
 
 plugin_start_lib_test_2.syms: plugin_start_lib_test_2.o
 	$(TEST_READELF) -sW $< >$@ 2>/dev/null
-
 
 plugin_test.so: plugin_test.o gcctestdir/ld
 	$(LINK) -Bgcctestdir/ -shared plugin_test.o
