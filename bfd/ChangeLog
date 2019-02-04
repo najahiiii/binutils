@@ -1,3 +1,28 @@
+2019-02-02  Nick Clifton  <nickc@redhat.com>
+
+	* version.m4 (BFD_VERSION): Set to 2.32.0.
+	* development.sh (development): Set to true.
+	(experimental) Set to true.
+	* configure: Regenerate.
+	* po/bfd.pot: Regenerate.
+
+2019-02-02  Nick Clifton  <nickc@redhat.com>
+
+	2.32 Release
+	* version.m4 (BFD_VERSION): Set to 2.32.
+	* development.sh (development): Set to false.
+	(experimental) Set to false.
+	* configure: Regenerate.
+	* po/bfd.pot: Regenerate.
+
+2019-01-28  Nick Clifton  <nickc@redhat.com>
+
+	Import from mainline:
+	2019-01-21  Sergio Durigan Junior  <sergiodj@redhat.com>
+
+	* elf32-arm.c (elf32_arm_final_link_relocate): Use 'llabs' instead
+	of 'labs' (and fix GCC warning).
+
 2019-01-25  Nick Clifton  <nickc@redhat.com>
 
 	* po/ru.po: Updated Russian translation.

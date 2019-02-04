@@ -1,3 +1,50 @@
+2019-02-02  Nick Clifton  <nickc@redhat.com>
+
+	* configure: Regenerate.
+
+2019-02-02  Nick Clifton  <nickc@redhat.com>
+
+	2.32 Release
+	* configure: Regenerate.
+	* po/gas.pot: Regenerate.
+
+2019-01-31  Andreas Krebbel  <krebbel@linux.ibm.com>
+
+	Backport from mainline
+	2019-01-31  Andreas Krebbel  <krebbel@linux.ibm.com>
+
+	* config/tc-s390.c (s390_parse_cpu): New entry for arch13.
+	* doc/c-s390.texi: Document arch13 march option.
+	* testsuite/gas/s390/s390.exp: Run the arch13 related tests.
+	* testsuite/gas/s390/zarch-arch13.d: New test.
+	* testsuite/gas/s390/zarch-arch13.s: New test.
+	* testsuite/gas/s390/zarch-z13.d: Expect the renamed mnemonics
+	also for z13.
+
+2019-01-31  Alan Modra  <amodra@gmail.com>
+
+	* config/tc-alpha.c (md_apply_fix): Correct range checks for
+	BFD_RELOC_ALPHA_NOP, BFD_RELOC_ALPHA_LDA, BFD_RELOC_ALPHA_BSR.
+	* config/tc-arm.c (md_apply_fix): Use llabs rather than abs.
+	* config/tc-csky.c (get_macro_reg_vals): Pass s to csky_show_error.
+
+2019-01-29  Max Filippov  <jcmvbkbc@gmail.com>
+
+	* config/tc-xtensa.c (md_apply_fix): Mark fixups for constant
+	symbols as done in md_apply_fix.
+	* testsuite/gas/all/forward.d: Don't XFAIL for xtensa.
+
+2019-01-28  Alan Modra  <amodra@gmail.com>
+
+	* configure.ac (ac_checking): Set from bfd/development.sh
+	development variable.
+	* configure: Regenerate.
+
+2019-01-28  Nick Clifton  <nickc@redhat.com>
+
+	* po/fr.po: Updated French translation.
+	* po/ru.po: Updated Russian translation.
+
 2019-01-25  Sudakshina Das  <sudi.das@arm.com>
 
 	* config/tc-aarch64.c (warn_unpredictable_ldst): Exempt
