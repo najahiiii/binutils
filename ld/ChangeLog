@@ -1,3 +1,71 @@
+2019-07-05  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	Backport from mainline.
+	2019-05-24  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* testsuite/ld-aarch64/aarch64-elf.exp: Add new tests.
+	* testsuite/ld-aarch64/variant_pcs-1.s: New asm for tests.
+	* testsuite/ld-aarch64/variant_pcs-2.s: New asm for tests.
+	* testsuite/ld-aarch64/variant_pcs-now.d: New test.
+	* testsuite/ld-aarch64/variant_pcs-r.d: New test.
+	* testsuite/ld-aarch64/variant_pcs-shared.d: New test.
+	* testsuite/ld-aarch64/variant_pcs.ld: New linker script for tests.
+
+	2019-05-28  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* testsuite/ld-aarch64/variant_pcs-now.d: Use --hash-style=sysv.
+	* testsuite/ld-aarch64/variant_pcs-shared.d: Likewise.
+
+2019-07-02  Srinath Parvathaneni  <srinath.parvathaneni@arm.com>
+
+	* testsuite/ld-arm/arm-elf.exp: Add tests.
+	* testsuite/ld-arm/cmse_main.s: New test.
+	* testsuite/ld-arm/cmse_main_sec_debug.d: Likewise.
+	* testsuite/ld-arm/cmse_sec_debug.s: Likewise.
+
+2019-06-24  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/24721
+	* testsuite/ld-x86-64/x86-64.exp: Run PR ld/24721 tests.
+	* testsuite/ld-x86-64/pr24721-x32.d: New file.
+	* testsuite/ld-x86-64/pr24721.d: Likewise.
+	* testsuite/ld-x86-64/pr24721.map: Likewise.
+	* testsuite/ld-x86-64/pr24721a.s: Likewise.
+	* testsuite/ld-x86-64/pr24721b.s: Likewise.
+
+2019-05-17  Alan Modra  <amodra@gmail.com>
+
+	PR 24567
+	* plugin.c (plugin_notice): Do not let a common symbol override
+	a non-common definition in IR.
+
+2019-04-18  Tamar Christina  <tamar.christina@arm.com>
+
+	Backport from mainline.
+	2019-04-11  Tamar Christina  <tamar.christina@arm.com>
+
+	PR ld/24302
+	* testsuite/ld-aarch64/aarch64-elf.exp: Add new test.
+	* testsuite/ld-aarch64/tls-relax-gdesc-le-now.d: New test.
+
+
+2019-04-17  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/24458
+	* testsuite/ld-x86-64/x86-64.exp: Run PR ld/24458 tests.
+	* testsuite/ld-x86-64/pr24458.s: New file.
+	* testsuite/ld-x86-64/pr24458a-x32.d: Likewise.
+	* testsuite/ld-x86-64/pr24458a.d: Likewise.
+	* testsuite/ld-x86-64/pr24458b-x32.d: Likewise.
+	* testsuite/ld-x86-64/pr24458b.d: Likewise.
+	* testsuite/ld-x86-64/pr24458c-x32.d: Likewise.
+	* testsuite/ld-x86-64/pr24458c.d: Likewise.
+
+2019-04-01  Tamar Christina  <tamar.christina@arm.com>
+
+	* testsuite/ld-arm/jump-reloc-veneers-cond-long.d: Update disassembly.
+	* testsuite/ld-arm/jump-reloc-veneers-long.d: Update disassembly.
+
 2019-02-09  Vineet Gupta  <vgupta@synopsys.com>
 
 	* emultempl/arclinux.em: Delete special INIT/FINI handling.

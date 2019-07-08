@@ -3155,6 +3155,7 @@ aarch64_print_operand (char *buf, size_t size, bfd_vma pc,
 
     case AARCH64_OPND_Rd_SP:
     case AARCH64_OPND_Rn_SP:
+    case AARCH64_OPND_Rt_SP:
     case AARCH64_OPND_SVE_Rn_SP:
     case AARCH64_OPND_Rm_SP:
       assert (opnd->qualifier == AARCH64_OPND_QLF_W
@@ -4901,10 +4902,6 @@ verify_constraints (const struct aarch64_inst *inst,
 		  case AARCH64_OPND_Vm:
 		  case AARCH64_OPND_Sn:
 		  case AARCH64_OPND_Sm:
-		  case AARCH64_OPND_Rn:
-		  case AARCH64_OPND_Rm:
-		  case AARCH64_OPND_Rn_SP:
-		  case AARCH64_OPND_Rm_SP:
 		    if (inst_op.reg.regno == blk_dest.reg.regno)
 		      {
 			num_op_used++;

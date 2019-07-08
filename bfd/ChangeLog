@@ -1,3 +1,48 @@
+2019-07-08  Alan Modra  <amodra@gmail.com>
+
+	PR 24785
+	* elf32-ppc.c (_bfd_elf_ppc_set_arch): Sanity check .PPC.EMB.apuinfo
+	size before reading first word.
+
+2019-07-05  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	Backport from mainline.
+	2019-05-24  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* elfnn-aarch64.c (elfNN_aarch64_merge_symbol_attribute): New function.
+	(struct elf_aarch64_link_hash_table): Add variant_pcs member.
+	(elfNN_aarch64_allocate_dynrelocs): Update variant_pcs.
+	(elfNN_aarch64_size_dynamic_sections): Add DT_AARCH64_VARIANT_PCS.
+	(elf_backend_merge_symbol_attribute): Define.
+
+2019-07-02  Srinath Parvathaneni  <srinath.parvathaneni@arm.com>
+
+	* elf32-arm.c (elf32_arm_gc_mark_extra_sections): Mark debug
+	sections when .text section contain secure entry functions
+	is marked.
+
+2019-06-24  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/24721
+	* elf-properties.c (elf_merge_gnu_property_list): Remove the
+	property after reporting property removal.
+
+2019-04-18  Tamar Christina  <tamar.christina@arm.com>
+
+	Backport from mainline.
+	2019-04-11  Tamar Christina  <tamar.christina@arm.com>
+
+	PR ld/24302
+	* elfnn-aarch64.c (elfNN_aarch64_size_dynamic_sections): Don't emit
+	DT_TLSDESC_GOT and DT_TLSDESC_PLT when DF_BIND_NOW.
+	(elfNN_aarch64_finish_dynamic_sections): Don't write PLT if DF_BIND_NOW.
+
+2019-04-17  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/24458
+	* elfxx-x86.h (SYMBOL_DEFINED_NON_SHARED_P): Also check x86
+	linker_def.
+
 2019-03-25  Claudiu Zissulescu  <claziss@synopsys.com>
 
 	Backport from mainline

@@ -1,3 +1,81 @@
+2019-07-05  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	Backport from mainline
+	2019-05-24  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* config/tc-aarch64.c (aarch64_elf_copy_symbol_attributes): Define.
+	* config/tc-aarch64.h (aarch64_elf_copy_symbol_attributes): Declare.
+	(OBJ_COPY_SYMBOL_ATTRIBUTES): Define.
+	* testsuite/gas/aarch64/symbol-variant_pcs-3.d: New test.
+	* testsuite/gas/aarch64/symbol-variant_pcs-3.s: New test.
+
+2019-07-05  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	Backport from mainline
+	2019-05-24  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* config/tc-aarch64.c (s_variant_pcs): New function.
+	* doc/c-aarch64.texi: Document .variant_pcs.
+	* testsuite/gas/aarch64/symbol-variant_pcs-1.d: New test.
+	* testsuite/gas/aarch64/symbol-variant_pcs-1.s: New test.
+	* testsuite/gas/aarch64/symbol-variant_pcs-2.d: New test.
+	* testsuite/gas/aarch64/symbol-variant_pcs-2.s: New test.
+
+2019-07-02  Richard Sandiford  <richard.sandiford@arm.com>
+
+	* testsuite/gas/aarch64/sve-movprfx_27.s,
+	* testsuite/gas/aarch64/sve-movprfx_27.d: New test.
+
+2019-07-02  Richard Sandiford  <richard.sandiford@arm.com>
+
+	* testsuite/gas/aarch64/sve-movprfx_26.s: Also test FCVTZS, FCVTZU,
+	SCVTF, UCVTF, LSR and ASR.
+	* testsuite/gas/aarch64/sve-movprfx_26.d: Update accordingly.
+	* testsuite/gas/aarch64/sve-movprfx_26.l: Likewise.
+
+2019-07-02  Richard Sandiford  <richard.sandiford@arm.com>
+
+	* testsuite/gas/aarch64/sve-movprfx_25.s: Allow CPY Z1.D.P1/M,X1
+	to be prefixed by MOVPRFX.
+	* testsuite/gas/aarch64/sve-movprfx_25.d: Update accordingly.
+	* testsuite/gas/aarch64/sve-movprfx_25.l: Likewise.
+
+2019-05-21  Andre Vieira  <andre.simoesdiasvieira@arm.com>
+
+	Backport from mainline
+	2019-05-21  Andre Vieira  <andre.simoesdiasvieira@arm.com>
+
+	PR24559
+	* config/tc-arm.c (move_or_literal_pool): Set size_req to 0 for MOVW
+	replacement.
+	* testsuite/gas/arm/load-pseudo.s: New test input.
+	* testsuite/gas/arm/m0-load-pseudo.d: New test.
+	* testsuite/gas/arm/m23-load-pseudo.d: New test.
+	* testsuite/gas/arm/m33-load-pseudo.d: New test.
+
+2019-04-16  Sudakshina Das  <sudi.das@arm.com>
+
+	Backport from mainline
+	2019-04-11  Sudakshina Das  <sudi.das@arm.com>
+
+	* config/tc-aarch64.c (process_omitted_operand): Add case for
+	AARCH64_OPND_Rt_SP.
+	(parse_operands): Likewise.
+	* testsuite/gas/aarch64/armv8_5-a-memtag.d: Update tests.
+	* testsuite/gas/aarch64/armv8_5-a-memtag.s: Likewise.
+	* testsuite/gas/aarch64/illegal-memtag.l: Likewise.
+	* testsuite/gas/aarch64/illegal-memtag.s: Likewise.
+
+2019-04-16  Sudakshina Das  <sudi.das@arm.com>
+
+	Backport from mainline
+	2019-04-11  Sudakshina Das  <sudi.das@arm.com>
+
+	* testsuite/gas/aarch64/armv8_5-a-memtag.d: New tests for ldgm and stgm.
+	* testsuite/gas/aarch64/armv8_5-a-memtag.s: Likewise.
+	* testsuite/gas/aarch64/illegal-memtag.l: Likewise.
+	* testsuite/gas/aarch64/illegal-memtag.s: Likewise.
+
 2019-03-12  Andreas Krebbel  <krebbel@linux.ibm.com>
 
 	Backport from mainline
